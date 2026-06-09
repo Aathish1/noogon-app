@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "240342962858",
+    "project_id": "noogon-app",
+    "storage_bucket": "noogon-app.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:240342962858:android:a6f573b90cfe006ef1b6d3",
+        "android_client_info": {
+          "package_name": "com.noogon.app"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyCW89MK-gH87H95HtbIOcvmkj2lLXAONVM"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

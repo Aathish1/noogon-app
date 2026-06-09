@@ -1,0 +1,79 @@
+{
+  "questions": [
+    {
+      "id": 1,
+      "type": "reflection",
+      "text": "Type the name of one person who would be proud of your streak."
+    },
+    {
+      "id": 2,
+      "type": "awareness",
+      "text": "What were you about to do when you picked up your phone?"
+    },
+    {
+      "id": 3,
+      "type": "redirect",
+      "text": "Name one thing you'll do instead of scrolling right now."
+    },
+    {
+      "id": 4,
+      "type": "affirmation",
+      "text": "Type 'I am stronger than this urge' to continue."
+    },
+    {
+      "id": 5,
+      "type": "goal",
+      "text": "What is one goal you're working toward this week?"
+    },
+    {
+      "id": 6,
+      "type": "accountability",
+      "text": "Name someone you're doing this for (including yourself)."
+    },
+    {
+      "id": 7,
+      "type": "gratitude",
+      "text": "What did you accomplish today that you're proud of?"
+    },
+    {
+      "id": 8,
+      "type": "awareness",
+      "text": "How will you feel in 30 minutes if you start scrolling now?"
+    },
+    {
+      "id": 9,
+      "type": "reflection",
+      "text": "What's one habit you completed today that future-you will thank you for?"
+    },
+    {
+      "id": 10,
+      "type": "redirect",
+      "text": "Name a physical activity you could do in the next 5 minutes instead."
+    },
+    {
+      "id": 11,
+      "type": "affirmation",
+      "text": "Type 'I choose growth over comfort' to continue."
+    },
+    {
+      "id": 12,
+      "type": "awareness",
+      "text": "On a scale of 1-10, how strong is your urge right now? Just type the number."
+    },
+    {
+      "id": 13,
+      "type": "goal",
+      "text": "What's one thing you want to be known for a year from now?"
+    },
+    {
+      "id": 14,
+      "type": "reflection",
+      "text": "What triggered this urge? Boredom, stress, loneliness, or something else?"
+    },
+    {
+      "id": 15,
+      "type": "redirect",
+      "text": "Describe one thing you can see right now that you're grateful for."
+    }
+  ]
+}
