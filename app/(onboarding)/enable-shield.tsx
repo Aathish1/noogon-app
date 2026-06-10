@@ -1,18 +1,16 @@
 import React from 'react';
-import { View, Text } from 'react-native';
+import { View, Text, Pressable } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { useRouter } from 'expo-router';
 import Animated, { FadeInDown } from 'react-native-reanimated';
-import * as Haptics from 'expo-haptics';
 
 import { GlassCard } from '@/components/shared/glass-card';
-import { HapticPressable } from '@/components/shared/haptic-pressable';
 import { useShieldStore } from '@/stores/use-shield-store';
 import { useOnboardingStore } from '@/stores/use-onboarding-store';
 import { SHIELD_DEFAULTS } from '@/lib/constants';
 
 /**
- * Enable Shield — turn on DNS filtering and set up app limits.
+ * Enable Shield — turn on system-level blocking and set up app limits.
  * Final onboarding step.
  */
 export default function EnableShieldScreen() {
@@ -40,7 +38,6 @@ export default function EnableShieldScreen() {
 
     setShieldEnabled();
     completeOnboarding();
-    Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success);
     router.replace('/(tabs)');
   };
 
@@ -59,7 +56,7 @@ export default function EnableShieldScreen() {
           className="pt-6 pb-4"
         >
           <Text className="text-muted-foreground text-sm font-sans mb-1">
-            Step 3 of 3
+            Step 4 of 4
           </Text>
           <Text className="text-foreground text-2xl font-sans-bold">
             Activate Shield
@@ -79,7 +76,7 @@ export default function EnableShieldScreen() {
               🛡️
             </Text>
             <Text className="text-foreground text-lg font-sans-semibold text-center">
-              DNS Content Filter
+              Shield Blocker
             </Text>
             <Text className="text-muted-foreground text-sm font-sans text-center mt-2 leading-5">
               Blocks distracting content at the network level.{'\n'}
@@ -96,7 +93,7 @@ export default function EnableShieldScreen() {
                 { emoji: '✅', text: 'Filters adult and distracting content' },
                 { emoji: '✅', text: 'Works across all apps and browsers' },
                 { emoji: '✅', text: 'Required for streak maintenance' },
-                { emoji: '⚡', text: 'Uses AdGuard Family DNS' },
+                { emoji: '⚡', text: 'Uses advanced system-level blocking' },
               ].map((item, i) => (
                 <View key={i} className={`flex-row items-center gap-3 ${i > 0 ? 'mt-3' : ''}`}>
                   <Text style={{ fontSize: 16 }}>{item.emoji}</Text>
@@ -115,25 +112,23 @@ export default function EnableShieldScreen() {
         entering={FadeInDown.delay(600).duration(400)}
         className="px-6 pb-6 gap-3"
       >
-        <HapticPressable
-          hapticStyle="heavy"
+        <Pressable
           onPress={handleEnable}
           className="bg-primary w-full py-4 rounded-2xl items-center"
         >
           <Text className="text-primary-foreground text-base font-sans-bold">
             🛡️ Enable Shield & Start
           </Text>
-        </HapticPressable>
+        </Pressable>
 
-        <HapticPressable
-          hapticStyle="light"
+        <Pressable
           onPress={handleSkip}
           className="w-full py-3 items-center"
         >
           <Text className="text-muted-foreground text-sm font-sans">
             Skip for now
           </Text>
-        </HapticPressable>
+        </Pressable>
       </Animated.View>
     </SafeAreaView>
   );

@@ -1,12 +1,10 @@
 import React, { useState } from 'react';
-import { View, Text, ScrollView } from 'react-native';
+import { View, Text, ScrollView, Pressable } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { useRouter } from 'expo-router';
 import Animated, { FadeInDown } from 'react-native-reanimated';
-import * as Haptics from 'expo-haptics';
 
 import { GlassCard } from '@/components/shared/glass-card';
-import { HapticPressable } from '@/components/shared/haptic-pressable';
 import { useHabitStore } from '@/stores/use-habit-store';
 import { useOnboardingStore } from '@/stores/use-onboarding-store';
 import { HABIT_TEMPLATES } from '@/lib/constants';
@@ -41,7 +39,7 @@ export default function SetGoalsScreen() {
           className="px-6 pt-6 pb-4"
         >
           <Text className="text-muted-foreground text-sm font-sans mb-1">
-            Step 2 of 3
+            Step 3 of 4
           </Text>
           <Text className="text-foreground text-2xl font-sans-bold">
             Set Your Rituals
@@ -64,8 +62,7 @@ export default function SetGoalsScreen() {
                 key={template.id}
                 entering={FadeInDown.delay(200 + index * 80).duration(400)}
               >
-                <HapticPressable
-                  hapticStyle="medium"
+                <Pressable
                   onPress={() => {
                     setSelectedTemplate(
                       isSelected ? null : template.id
@@ -113,7 +110,7 @@ export default function SetGoalsScreen() {
                       ))}
                     </View>
                   </GlassCard>
-                </HapticPressable>
+                </Pressable>
               </Animated.View>
             );
           })}
@@ -125,15 +122,14 @@ export default function SetGoalsScreen() {
         entering={FadeInDown.delay(600).duration(400)}
         className="px-6 pb-6 gap-3"
       >
-        <HapticPressable
-          hapticStyle="medium"
+        <Pressable
           onPress={handleContinue}
           className="bg-primary w-full py-4 rounded-2xl items-center"
         >
           <Text className="text-primary-foreground text-base font-sans-bold">
             {selectedTemplate ? 'Import & Continue' : 'Skip for Now'}
           </Text>
-        </HapticPressable>
+        </Pressable>
       </Animated.View>
     </SafeAreaView>
   );

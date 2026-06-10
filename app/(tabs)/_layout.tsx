@@ -1,40 +1,38 @@
 import React from 'react';
-import { View, Text, Platform } from 'react-native';
+import { Text, Platform } from 'react-native';
 import { Tabs } from 'expo-router';
-import * as Haptics from 'expo-haptics';
 import { THEME } from '@/lib/constants';
 import { HomeAngle, Shield, Stars, User } from '@solar-icons/react-native/BoldDuotone';
 
 /**
- * Tab icon component with active/inactive states.
+ * Renders a standalone tab icon (no label — label is handled by tabBarLabel).
  */
-function TabIcon({
-  Icon,
-  label,
-  focused,
-}: {
-  Icon: any;
-  label: string;
-  focused: boolean;
-}) {
+function renderTabIcon(Icon: any, focused: boolean) {
   return (
-    <View className="items-center justify-center pt-2">
-      <Icon
-        size={24}
-        color={focused ? THEME.primary : THEME.mutedForeground}
-        style={{ opacity: focused ? 1 : 0.7 }}
-      />
-      <Text
-        style={{
-          fontSize: 10,
-          marginTop: 4,
-          color: focused ? THEME.primary : THEME.mutedForeground,
-          fontFamily: focused ? 'Inter-SemiBold' : 'Inter',
-        }}
-      >
-        {label}
-      </Text>
-    </View>
+    <Icon
+      size={24}
+      color={focused ? THEME.primary : THEME.mutedForeground}
+      style={{ opacity: focused ? 1 : 0.7 }}
+    />
+  );
+}
+
+/**
+ * Renders a standalone tab label (no icon — icon is handled by tabBarIcon).
+ */
+function renderTabLabel(label: string, focused: boolean) {
+  return (
+    <Text
+      numberOfLines={1}
+      style={{
+        fontSize: 10,
+        color: focused ? THEME.primary : THEME.mutedForeground,
+        fontFamily: focused ? 'Inter-SemiBold' : 'Inter',
+        textAlign: 'center',
+      }}
+    >
+      {label}
+    </Text>
   );
 }
 
@@ -53,7 +51,7 @@ export default function TabLayout() {
           elevation: 0,
           shadowOpacity: 0,
         },
-        tabBarShowLabel: false,
+        tabBarShowLabel: true,
         tabBarActiveTintColor: THEME.primary,
         tabBarInactiveTintColor: THEME.mutedForeground,
       }}
@@ -61,33 +59,29 @@ export default function TabLayout() {
       <Tabs.Screen
         name="index"
         options={{
-          tabBarIcon: ({ focused }) => (
-            <TabIcon Icon={HomeAngle} label="Home" focused={focused} />
-          ),
+          tabBarIcon: ({ focused }) => renderTabIcon(HomeAngle, focused),
+          tabBarLabel: ({ focused }) => renderTabLabel('Home', focused),
         }}
       />
       <Tabs.Screen
         name="shield"
         options={{
-          tabBarIcon: ({ focused }) => (
-            <TabIcon Icon={Shield} label="Shield" focused={focused} />
-          ),
+          tabBarIcon: ({ focused }) => renderTabIcon(Shield, focused),
+          tabBarLabel: ({ focused }) => renderTabLabel('Shield', focused),
         }}
       />
       <Tabs.Screen
         name="rituals"
         options={{
-          tabBarIcon: ({ focused }) => (
-            <TabIcon Icon={Stars} label="Rituals" focused={focused} />
-          ),
+          tabBarIcon: ({ focused }) => renderTabIcon(Stars, focused),
+          tabBarLabel: ({ focused }) => renderTabLabel('Rituals', focused),
         }}
       />
       <Tabs.Screen
         name="profile"
         options={{
-          tabBarIcon: ({ focused }) => (
-            <TabIcon Icon={User} label="Profile" focused={focused} />
-          ),
+          tabBarIcon: ({ focused }) => renderTabIcon(User, focused),
+          tabBarLabel: ({ focused }) => renderTabLabel('Profile', focused),
         }}
       />
     </Tabs>

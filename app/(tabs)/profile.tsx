@@ -1,5 +1,5 @@
-import React from 'react';
-import { View, Text, ScrollView } from 'react-native';
+import React, { useState } from 'react';
+import { View, Text, ScrollView, Pressable, TextInput, ActivityIndicator } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import Animated, { FadeInDown } from 'react-native-reanimated';
 
@@ -7,14 +7,21 @@ import { GlassCard } from '@/components/shared/glass-card';
 import { SectionHeader } from '@/components/shared/section-header';
 import { XPBar } from '@/components/dashboard/xp-bar';
 import { AnimatedCounter } from '@/components/shared/animated-counter';
-import { HapticPressable } from '@/components/shared/haptic-pressable';
 
 import { useStreakStore } from '@/stores/use-streak-store';
 import { useHabitStore } from '@/stores/use-habit-store';
 import { useCompanionStore } from '@/stores/use-companion-store';
+import { useUserStore } from '@/stores/use-user-store';
 import { getCurrentLevel } from '@/lib/xp-engine';
-import { RECOVERY_MILESTONES, COMPANION_TYPES, XP_REWARDS } from '@/lib/constants';
+import { RECOVERY_MILESTONES, COMPANION_TYPES, XP_REWARDS, THEME } from '@/lib/constants';
 import { useOnboardingStore } from '@/stores/use-onboarding-store';
+import { Pen } from '@solar-icons/react-native/BoldDuotone';
+
+const API_BASE_URL = __DEV__
+  ? 'http://localhost:3001'
+  : 'https://api-noogon-new.onrender.com';
+
+const AVATAR_OPTIONS = ['👤', '🔥', '🛡️', '⚡', '🦊', '🦁', '🐼', '🐨', '🧙', '🚀', '🐱', '🐶'];
 
 /**
  * PROFILE — XP, levels, streak history, milestones, settings.
@@ -29,6 +36,44 @@ export default function ProfileScreen() {
   const level = getCurrentLevel(totalXP);
   const completionRate = useHabitStore((s) => s.getCompletionRate(30));
   const resetOnboarding = useOnboardingStore((s) => s.resetOnboarding);
+
+  // User store
+  const userName = useUserStore((s) => s.name);
+  const userAvatar = useUserStore((s) => s.avatar);
+  const setUserName = useUserStore((s) => s.setName);
+  const setUserAvatar = useUserStore((s) => s.setAvatar);
+
+  // Edit mode state
+  const [isEditing, setIsEditing] = useState(false);
+  const [editName, setEditName] = useState(userName);
+  const [editAvatar, setEditAvatar] = useState(userAvatar);
+  const [isSaving, setIsSaving] = useState(false);
+
+  const handleSave = async () => {
+    setIsSaving(true);
+    setUserName(editName.trim() || 'Forger');
+    setUserAvatar(editAvatar);
+
+    // Sync with backend (with 3s timeout so it doesn't hang)
+    try {
+      const controller = new AbortController();
+      const timeoutId = setTimeout(() => controller.abort(), 3000);
+
+      await fetch(`${API_BASE_URL}/api/user/profile`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ name: editName.trim() || 'Forger', avatar: editAvatar }),
+        signal: controller.signal,
+      });
+
+      clearTimeout(timeoutId);
+    } catch (err) {
+      console.log('Backend sync skipped (offline or timeout):', err);
+    }
+
+    setIsSaving(false);
+    setIsEditing(false);
+  };
 
   // Find reached milestones
   const reachedMilestones = RECOVERY_MILESTONES.filter(
@@ -55,10 +100,116 @@ export default function ProfileScreen() {
           </Text>
         </Animated.View>
 
+        {/* User Identity Card */}
+        <Animated.View
+          entering={FadeInDown.delay(50).duration(400)}
+          className="px-5 mt-3 mb-4"
+        >
+          <GlassCard>
+            {isEditing ? (
+              <View className="gap-5">
+                {/* Header Row: Current Avatar + Name Input */}
+                <View className="flex-row items-center gap-4">
+                  <View className="w-[72px] h-[72px] rounded-full bg-[#1A1A24] items-center justify-center">
+                    <Text style={{ fontSize: 36 }}>{editAvatar}</Text>
+                  </View>
+                  <View className="flex-1">
+                    <Text className="text-muted-foreground text-sm font-sans mb-1.5">
+                      Your Name
+                    </Text>
+                    <TextInput
+                      value={editName}
+                      onChangeText={setEditName}
+                      placeholder="Enter your name"
+                      placeholderTextColor="#8A8A96"
+                      maxLength={20}
+                      className="bg-[#1A1A24] text-foreground text-base font-sans rounded-xl px-4 py-3"
+                    />
+                  </View>
+                </View>
+
+                {/* Avatar grid */}
+                <View>
+                  <Text className="text-muted-foreground text-sm font-sans mb-3">
+                    Choose Avatar
+                  </Text>
+                  <View className="flex-row flex-wrap gap-2.5 justify-start">
+                    {AVATAR_OPTIONS.map((emoji) => (
+                      <Pressable
+                        key={emoji}
+                        onPress={() => setEditAvatar(emoji)}
+                        className={`w-12 h-12 rounded-xl items-center justify-center ${
+                          editAvatar === emoji
+                            ? 'bg-primary/10 border border-primary/50'
+                            : 'bg-[#1A1A24]'
+                        }`}
+                      >
+                        <Text style={{ fontSize: 24 }}>{emoji}</Text>
+                      </Pressable>
+                    ))}
+                  </View>
+                </View>
+
+                {/* Save / Cancel */}
+                <View className="flex-row justify-end gap-3 mt-2">
+                  <Pressable
+                    onPress={() => {
+                      setIsEditing(false);
+                      setEditName(userName);
+                      setEditAvatar(userAvatar);
+                    }}
+                    className="py-2.5 px-6 rounded-xl items-center bg-[#1A1A24]"
+                  >
+                    <Text className="text-muted-foreground text-sm font-sans-medium">
+                      Cancel
+                    </Text>
+                  </Pressable>
+                  <Pressable
+                    onPress={handleSave}
+                    disabled={isSaving}
+                    className="py-2.5 px-8 rounded-xl items-center bg-primary"
+                  >
+                    {isSaving ? (
+                      <ActivityIndicator size="small" color="#0A0A0F" />
+                    ) : (
+                      <Text className="text-primary-foreground text-sm font-sans-bold">
+                        Save
+                      </Text>
+                    )}
+                  </Pressable>
+                </View>
+              </View>
+            ) : (
+              <Pressable
+                onPress={() => {
+                  setEditName(userName);
+                  setEditAvatar(userAvatar);
+                  setIsEditing(true);
+                }}
+              >
+                <View className="flex-row items-center gap-3">
+                  <View className="w-14 h-14 rounded-2xl bg-primary/15 items-center justify-center">
+                    <Text style={{ fontSize: 28 }}>{userAvatar}</Text>
+                  </View>
+                  <View className="flex-1">
+                    <Text className="text-foreground text-base font-sans-semibold">
+                      {userName}
+                    </Text>
+                    <Text className="text-muted-foreground text-xs font-sans mt-0.5">
+                      Tap to edit profile
+                    </Text>
+                  </View>
+                  <Pen size={20} color={THEME.mutedForeground} />
+                </View>
+              </Pressable>
+            )}
+          </GlassCard>
+        </Animated.View>
+
         {/* Level Card */}
         <Animated.View
           entering={FadeInDown.delay(100).duration(400)}
-          className="px-5 mt-3 mb-4"
+          className="px-5 mb-4"
         >
           <GlassCard variant="glow" className="items-center py-6">
             <Text style={{ fontSize: 56 }} className="mb-2">
@@ -85,9 +236,9 @@ export default function ProfileScreen() {
           <GlassCard className="flex-1 items-center py-4">
             <AnimatedCounter
               value={currentStreak}
-              className="text-primary text-2xl"
+              className="text-primary text-2xl text-center"
             />
-            <Text className="text-muted-foreground text-xs font-sans mt-1">
+            <Text className="text-muted-foreground text-xs font-sans mt-1 text-center">
               Current Streak
             </Text>
           </GlassCard>
@@ -95,18 +246,18 @@ export default function ProfileScreen() {
           <GlassCard className="flex-1 items-center py-4">
             <AnimatedCounter
               value={longestStreak}
-              className="text-foreground text-2xl"
+              className="text-foreground text-2xl text-center"
             />
-            <Text className="text-muted-foreground text-xs font-sans mt-1">
+            <Text className="text-muted-foreground text-xs font-sans mt-1 text-center">
               Longest Streak
             </Text>
           </GlassCard>
 
           <GlassCard className="flex-1 items-center py-4">
-            <Text className="text-foreground text-2xl font-sans-bold">
+            <Text className="text-foreground text-2xl font-sans-bold text-center">
               {Math.round(completionRate * 100)}%
             </Text>
-            <Text className="text-muted-foreground text-xs font-sans mt-1">
+            <Text className="text-muted-foreground text-xs font-sans mt-1 text-center">
               30-Day Rate
             </Text>
           </GlassCard>
@@ -120,7 +271,7 @@ export default function ProfileScreen() {
           <SectionHeader title="Your Companion" />
           <GlassCard className="flex-row items-center gap-3">
             <Text style={{ fontSize: 36 }}>{companionInfo?.emoji}</Text>
-            <View>
+            <View className="flex-1">
               <Text className="text-foreground text-base font-sans-semibold">
                 {companionInfo?.name}
               </Text>
@@ -215,15 +366,14 @@ export default function ProfileScreen() {
           entering={FadeInDown.delay(500).duration(400)}
           className="px-5 mt-4"
         >
-          <HapticPressable
-            hapticStyle="heavy"
+          <Pressable
             onPress={resetOnboarding}
             className="border border-destructive/30 rounded-xl py-3 items-center"
           >
             <Text className="text-destructive text-sm font-sans">
               Reset Onboarding (Dev)
             </Text>
-          </HapticPressable>
+          </Pressable>
         </Animated.View>
       </ScrollView>
     </SafeAreaView>

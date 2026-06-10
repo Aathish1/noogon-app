@@ -1,10 +1,8 @@
 import React from 'react';
-import { View, Text } from 'react-native';
+import { View, Text, Pressable } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { useRouter } from 'expo-router';
 import Animated, { FadeIn, FadeInDown, FadeInUp } from 'react-native-reanimated';
-
-import { HapticPressable } from '@/components/shared/haptic-pressable';
 
 /**
  * Welcome screen — first thing users see on fresh install.
@@ -77,15 +75,14 @@ export default function WelcomeScreen() {
         entering={FadeInUp.delay(1500).duration(600)}
         className="px-8 pb-6"
       >
-        <HapticPressable
-          hapticStyle="medium"
-          onPress={() => router.push('/(onboarding)/choose-companion')}
+        <Pressable
+          onPress={() => router.push('/(onboarding)/create-profile')}
           className="bg-primary w-full py-4 rounded-2xl items-center"
         >
           <Text className="text-primary-foreground text-base font-sans-bold">
             Let's Begin
           </Text>
-        </HapticPressable>
+        </Pressable>
 
         <Text className="text-muted-foreground text-xs font-sans text-center mt-3">
           Takes less than 2 minutes to set up

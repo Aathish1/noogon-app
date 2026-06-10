@@ -34,6 +34,13 @@ function rateLimit(req: express.Request, res: express.Response, next: express.Ne
 
 app.use(rateLimit);
 
+// ─── In-memory profile storage ──────────────────────────────────
+let userProfile = {
+  name: 'Forger',
+  avatar: '👤',
+  updatedAt: new Date().toISOString(),
+};
+
 // ─── Routes ─────────────────────────────────────────────────────
 
 // Health check
@@ -44,6 +51,26 @@ app.get('/api/health', (_req: express.Request, res: express.Response) => {
     version: '1.0.0',
     timestamp: new Date().toISOString(),
   });
+});
+
+// Get user profile
+app.get('/api/user/profile', (_req: express.Request, res: express.Response) => {
+  res.json(userProfile);
+});
+
+// Store/update user profile
+app.post('/api/user/profile', (req: express.Request, res: express.Response) => {
+  const { name, avatar } = req.body;
+
+  if (name !== undefined) {
+    userProfile.name = String(name).trim().slice(0, 50) || 'Forger';
+  }
+  if (avatar !== undefined) {
+    userProfile.avatar = String(avatar).slice(0, 10) || '👤';
+  }
+  userProfile.updatedAt = new Date().toISOString();
+
+  res.json({ success: true, profile: userProfile });
 });
 
 // Get a random disconnect prompt question
@@ -78,6 +105,8 @@ app.listen(PORT, () => {
   
   Endpoints:
     GET /api/health              Health check
+    GET /api/user/profile        Get user profile
+    POST /api/user/profile       Store user profile
     GET /api/questions/random    Random disconnect prompt
     GET /api/questions           All questions
     GET /api/questions/type/:t   Random question by type

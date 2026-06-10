@@ -18,6 +18,7 @@ import { useStreakStore } from '@/stores/use-streak-store';
 import { useHabitStore } from '@/stores/use-habit-store';
 import { useCompanionStore } from '@/stores/use-companion-store';
 import { useShieldStore } from '@/stores/use-shield-store';
+import { useUserStore } from '@/stores/use-user-store';
 import { getNextMilestone } from '@/lib/streak-engine';
 import { COMPANION_TYPES, THEME } from '@/lib/constants';
 import { toDateKey } from '@/lib/utils';
@@ -44,8 +45,58 @@ export default function HomeScreen() {
 
   const dnsEnabled = useShieldStore((s) => s.dnsEnabled);
 
+  const userName = useUserStore((s) => s.name);
+  const userAvatar = useUserStore((s) => s.avatar);
+
   const nextMilestone = getNextMilestone(currentStreak);
   const companionInfo = COMPANION_TYPES.find((c) => c.type === companionType);
+
+  // Build dynamic alerts
+  const alerts = useMemo(() => {
+    const items: Array<{ emoji: string; text: string; variant: 'success' | 'warning' | 'info' }> = [];
+
+    // Companion / habit alert
+    const remaining = habits.length - completedToday.length;
+    if (remaining > 0) {
+      items.push({
+        emoji: companionInfo?.emoji ?? '🐕',
+        text: `Hey ${userName}, I'm waiting! You have ${remaining} more ritual${remaining > 1 ? 's' : ''} to complete today.`,
+        variant: 'warning',
+      });
+    } else if (habits.length > 0) {
+      items.push({
+        emoji: '🎉',
+        text: `Amazing, ${userName}! All rituals completed today. Your companion is thriving!`,
+        variant: 'success',
+      });
+    }
+
+    // Shield status alert
+    if (dnsEnabled) {
+      items.push({
+        emoji: '🛡️',
+        text: `Hey ${userName}, system protection is active and blocking distractions.`,
+        variant: 'success',
+      });
+    } else {
+      items.push({
+        emoji: '⚠️',
+        text: `${userName}, your Shield is down! Turn it on to protect your streak.`,
+        variant: 'warning',
+      });
+    }
+
+    // Streak alert
+    if (currentStreak >= 3) {
+      items.push({
+        emoji: '🔥',
+        text: `Keep it up, ${userName}! You're forging a strong habit streak.`,
+        variant: 'info',
+      });
+    }
+
+    return items;
+  }, [habits.length, completedToday.length, dnsEnabled, currentStreak, userName, companionInfo]);
 
   const handleToggleHabit = useCallback(
     (habitId: string) => {
@@ -72,13 +123,16 @@ export default function HomeScreen() {
           entering={FadeInDown.duration(500)}
           className="flex-row items-center justify-between px-5 pt-3 pb-2"
         >
-          <View>
-            <Text className="text-foreground text-2xl font-sans-bold">
-              Forge
-            </Text>
-            <Text className="text-muted-foreground text-sm font-sans">
-              Forge the person you want to be
-            </Text>
+          <View className="flex-row items-center gap-2">
+            <Text style={{ fontSize: 28 }}>{userAvatar}</Text>
+            <View>
+              <Text className="text-foreground text-2xl font-sans-bold">
+                Hey {userName}
+              </Text>
+              <Text className="text-muted-foreground text-sm font-sans">
+                Forge the person you want to be
+              </Text>
+            </View>
           </View>
           <LevelBadge totalXP={totalXP} size="small" />
         </Animated.View>
@@ -126,12 +180,12 @@ export default function HomeScreen() {
                 ) : (
                   <DangerCircle size={24} color={THEME.destructive} />
                 )}
-                <View>
+                <View className="flex-1">
                   <Text className="text-foreground text-xs font-sans-semibold">
                     Shield {dnsEnabled ? 'Active' : 'Down'}
                   </Text>
                   <Text className="text-muted-foreground text-xs font-sans">
-                    {dnsEnabled ? 'DNS filter protecting you' : 'Turn on to maintain streak'}
+                    {dnsEnabled ? 'Shield protection is active' : 'Turn on to maintain streak'}
                   </Text>
                 </View>
               </View>
@@ -163,6 +217,32 @@ export default function HomeScreen() {
             <XPBar totalXP={totalXP} />
           </GlassCard>
         </Animated.View>
+
+        {/* Alerts Feed */}
+        {alerts.length > 0 && (
+          <Animated.View
+            entering={FadeInDown.delay(450).duration(500)}
+            className="px-5 mt-4"
+          >
+            <SectionHeader title="Alerts" />
+            <View className="gap-2">
+              {alerts.map((alert, index) => (
+                <GlassCard
+                  key={index}
+                  variant={alert.variant === 'success' ? 'glow' : 'default'}
+                  className="py-2.5"
+                >
+                  <View className="flex-row items-start gap-2">
+                    <Text style={{ fontSize: 16 }}>{alert.emoji}</Text>
+                    <Text className="text-foreground text-xs font-sans flex-1 leading-4">
+                      {alert.text}
+                    </Text>
+                  </View>
+                </GlassCard>
+              ))}
+            </View>
+          </Animated.View>
+        )}
 
         {/* Today's Habits */}
         <Animated.View

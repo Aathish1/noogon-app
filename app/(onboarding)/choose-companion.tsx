@@ -1,12 +1,10 @@
 import React from 'react';
-import { View, Text } from 'react-native';
+import { View, Text, Pressable } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { useRouter } from 'expo-router';
 import Animated, { FadeInDown } from 'react-native-reanimated';
-import * as Haptics from 'expo-haptics';
 
 import { GlassCard } from '@/components/shared/glass-card';
-import { HapticPressable } from '@/components/shared/haptic-pressable';
 import { useCompanionStore } from '@/stores/use-companion-store';
 import { useOnboardingStore } from '@/stores/use-onboarding-store';
 import { COMPANION_TYPES, type CompanionType } from '@/lib/constants';
@@ -23,7 +21,6 @@ export default function ChooseCompanionScreen() {
 
   const handleSelect = (type: CompanionType) => {
     setType(type);
-    Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Medium);
   };
 
   const handleContinue = () => {
@@ -40,7 +37,7 @@ export default function ChooseCompanionScreen() {
           className="pt-6 pb-4"
         >
           <Text className="text-muted-foreground text-sm font-sans mb-1">
-            Step 1 of 3
+            Step 2 of 4
           </Text>
           <Text className="text-foreground text-2xl font-sans-bold">
             Choose Your Companion
@@ -59,8 +56,7 @@ export default function ChooseCompanionScreen() {
                 key={companion.type}
                 entering={FadeInDown.delay(200 + index * 100).duration(400)}
               >
-                <HapticPressable
-                  hapticStyle="medium"
+                <Pressable
                   onPress={() => handleSelect(companion.type)}
                 >
                   <GlassCard
@@ -94,7 +90,7 @@ export default function ChooseCompanionScreen() {
                       </View>
                     )}
                   </GlassCard>
-                </HapticPressable>
+                </Pressable>
               </Animated.View>
             );
           })}
@@ -106,15 +102,14 @@ export default function ChooseCompanionScreen() {
         entering={FadeInDown.delay(600).duration(400)}
         className="px-6 pb-6"
       >
-        <HapticPressable
-          hapticStyle="medium"
+        <Pressable
           onPress={handleContinue}
           className="bg-primary w-full py-4 rounded-2xl items-center"
         >
           <Text className="text-primary-foreground text-base font-sans-bold">
             Continue
           </Text>
-        </HapticPressable>
+        </Pressable>
       </Animated.View>
     </SafeAreaView>
   );

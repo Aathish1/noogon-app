@@ -1,5 +1,5 @@
 import React, { useCallback } from 'react';
-import { View, Text, ScrollView, Switch, Alert } from 'react-native';
+import { View, Text, ScrollView, Switch, Alert, Pressable } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import Animated, { FadeInDown } from 'react-native-reanimated';
 import { useRouter } from 'expo-router';
@@ -7,7 +7,6 @@ import { ShieldCheck, DangerCircle, DangerTriangle, Calendar } from '@solar-icon
 
 import { GlassCard } from '@/components/shared/glass-card';
 import { SectionHeader } from '@/components/shared/section-header';
-import { HapticPressable } from '@/components/shared/haptic-pressable';
 import { useShieldStore } from '@/stores/use-shield-store';
 import { SHIELD_DEFAULTS, THEME } from '@/lib/constants';
 
@@ -87,11 +86,11 @@ export default function ShieldScreen() {
                 </View>
                 <View className="flex-1">
                   <Text className="text-foreground text-base font-sans-semibold">
-                    DNS Content Filter
+                    Shield Blocker
                   </Text>
                   <Text className="text-muted-foreground text-xs font-sans mt-0.5">
                     {dnsEnabled
-                      ? 'AdGuard Family DNS active'
+                      ? 'System protection is active'
                       : 'Network protection disabled'}
                   </Text>
                 </View>
@@ -107,7 +106,7 @@ export default function ShieldScreen() {
             {dnsEnabled && (
               <View className="mt-3 pt-3 border-t border-border/30">
                 <Text className="text-success text-xs font-sans">
-                  ✓ Zero battery drain — system-level DNS filtering
+                  ✓ Zero battery drain — system-level blocker active
                 </Text>
               </View>
             )}
@@ -207,13 +206,13 @@ export default function ShieldScreen() {
             title="Focus Windows"
             subtitle="Auto-block during work hours"
             action={
-              <HapticPressable
+              <Pressable
                 className="bg-primary/15 px-3 py-1.5 rounded-lg"
               >
                 <Text className="text-primary text-xs font-sans-semibold">
                   + Add
                 </Text>
-              </HapticPressable>
+              </Pressable>
             }
           />
           <GlassCard>

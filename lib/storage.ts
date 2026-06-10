@@ -12,6 +12,7 @@ export const STORAGE_KEYS = {
   ONBOARDING: 'forge:onboarding',
   SETTINGS: 'forge:settings',
   FOCUS: 'forge:focus',
+  USER: 'forge:user',
 } as const;
 
 /**

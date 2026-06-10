@@ -2,12 +2,10 @@ import React, { useCallback, useState } from 'react';
 import { View, Text, ScrollView, Pressable } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import Animated, { FadeInDown, FadeIn, Layout } from 'react-native-reanimated';
-import * as Haptics from 'expo-haptics';
 import { useRouter } from 'expo-router';
 
 import { GlassCard } from '@/components/shared/glass-card';
 import { SectionHeader } from '@/components/shared/section-header';
-import { HapticPressable } from '@/components/shared/haptic-pressable';
 import { useHabitStore, type Habit } from '@/stores/use-habit-store';
 import { useStreakStore } from '@/stores/use-streak-store';
 import { toDateKey, getLastNDays } from '@/lib/utils';
@@ -43,7 +41,6 @@ export default function RitualsScreen() {
       } else {
         completeHabit(habitId);
         addXP('habit_complete');
-        Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success);
       }
     },
     [completedToday, completeHabit, uncompleteHabit, addXP]
@@ -54,7 +51,6 @@ export default function RitualsScreen() {
       const template = HABIT_TEMPLATES.find((t) => t.id === templateId);
       if (template) {
         importHabits(template.habits);
-        Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success);
       }
     },
     [importHabits]
@@ -93,9 +89,8 @@ export default function RitualsScreen() {
             const isActive = activeSlot === slot;
             const count = slot === 'morning' ? morningHabits.length : eveningHabits.length;
             return (
-              <HapticPressable
+              <Pressable
                 key={slot}
-                hapticStyle="selection"
                 onPress={() => setActiveSlot(slot)}
                 className={cn(
                   'flex-1 py-2.5 rounded-lg items-center flex-row justify-center gap-2',
@@ -115,7 +110,7 @@ export default function RitualsScreen() {
                 >
                   {slot} ({count})
                 </Text>
-              </HapticPressable>
+              </Pressable>
             );
           })}
         </Animated.View>
@@ -140,15 +135,14 @@ export default function RitualsScreen() {
               <Text className="text-muted-foreground text-sm font-sans text-center mb-4">
                 Add habits or import a template to get started
               </Text>
-              <HapticPressable
-                hapticStyle="medium"
+              <Pressable
                 onPress={() => router.push('/(modals)/habit-editor')}
                 className="bg-primary px-5 py-2.5 rounded-xl"
               >
                 <Text className="text-primary-foreground text-sm font-sans-semibold">
                   + Add Habit
                 </Text>
-              </HapticPressable>
+              </Pressable>
             </GlassCard>
           ) : (
             <View className="gap-2">
@@ -160,8 +154,7 @@ export default function RitualsScreen() {
                     entering={FadeInDown.delay(index * 60).duration(300)}
                     layout={Layout.springify()}
                   >
-                    <HapticPressable
-                      hapticStyle="selection"
+                    <Pressable
                       onPress={() => handleToggleHabit(habit.id)}
                     >
                       <GlassCard
@@ -204,21 +197,20 @@ export default function RitualsScreen() {
                           )}
                         </View>
                       </GlassCard>
-                    </HapticPressable>
+                    </Pressable>
                   </Animated.View>
                 );
               })}
 
               {/* Add habit button */}
-              <HapticPressable
-                hapticStyle="medium"
+              <Pressable
                 onPress={() => router.push('/(modals)/habit-editor')}
                 className="border border-dashed border-border/50 rounded-2xl py-3 items-center mt-1"
               >
                 <Text className="text-muted-foreground text-sm font-sans">
                   + Add {activeSlot} habit
                 </Text>
-              </HapticPressable>
+              </Pressable>
             </View>
           )}
         </Animated.View>
@@ -239,9 +231,8 @@ export default function RitualsScreen() {
               contentContainerStyle={{ gap: 12 }}
             >
               {HABIT_TEMPLATES.map((template) => (
-                <HapticPressable
+                <Pressable
                   key={template.id}
-                  hapticStyle="medium"
                   onPress={() => handleImportTemplate(template.id)}
                 >
                   <GlassCard className="w-44">
@@ -261,7 +252,7 @@ export default function RitualsScreen() {
                       {template.habits.length} habits →
                     </Text>
                   </GlassCard>
-                </HapticPressable>
+                </Pressable>
               ))}
             </ScrollView>
           </Animated.View>
